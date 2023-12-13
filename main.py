@@ -22,6 +22,16 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import pairwise_distances_argmin
 from sklearn.cluster import KMeans
+##### feature selection ######
+from sklearn.linear_model import Lasso
+from sklearn.feature_selection import SelectKBest, chi2
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.feature_selection import SelectFromModel
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.feature_selection import f_classif
+from sklearn.feature_selection import  mutual_info_classif
+
+
 
 from machine_learning.ml import cross_validate_k_fold
 
@@ -40,6 +50,7 @@ def get_results(model, X, y, model_name, n_clusters):
     return results
 
 def experiment(X, y):
+
     # results using knn for classification with K = 5 and 3-anonimity model
     results_knn = get_results(KNeighborsClassifier(n_neighbors=5), X, y, 'KNN', 3)
     print(results_knn)
@@ -72,6 +83,110 @@ def experiment(X, y):
 
     return results
 
+def Chi2(X, y) : 
+    for i in range(2, 11, 1):
+        k = i  # Number of top features to select
+        selector_ch2 = SelectKBest(chi2, k=k)
+        X_selected = selector_ch2.fit_transform(X, y)
+        # print the shape of the dataset
+        # print( X_selected.shape)
+        # run the experiment 
+        results = experiment( X_selected, y)
+        print(results)
+
+    for i in range(10, 80, 5):
+        k = i  # Number of top features to select
+        selector_ch2 = SelectKBest(chi2, k=k)
+        X_new_ch2 = selector_ch2.fit_transform(X, y)
+        # print the shape of the dataset
+        print(X_new_ch2.shape)
+        # run the experiment 
+        results = experiment(X_new_ch2, y)
+        print(results)
+
+def Lasso(X, y):
+    alpha = 0.01  # Adjust regularization strength
+    lasso = Lasso(alpha=alpha)
+    lasso.fit(X, y)
+    non_zero_coefs = np.where(lasso.coef_ != 0)[0]
+    X_selected = X[:, non_zero_coefs]
+    # print("XShape",X.shape)
+    # print("Lasso Shape",X_selected.shape)
+    # run the experiment 
+    results = experiment(X_selected, y)
+    print(results)
+
+def LowVariance(X, y):
+    threshold = 0.1  # Ajuste este valor conforme necessário
+    variance_selector = VarianceThreshold(threshold)
+
+    # Aplicando o seletor aos dados de treinamento
+    X_selected = variance_selector.fit_transform(X)
+
+
+    # Imprimindo a forma (shape) do conjunto de dados após a seleção de características
+    # print("Low Variance Shape", X_selected.shape)
+    results = experiment(X_selected, y)
+    print(results)
+
+def ExtraTree(X, y):
+    for i in range(3,80,5):
+        extra_trees_model = ExtraTreesClassifier(
+            n_estimators=100,
+            criterion='gini',
+            max_depth=None,
+            max_features= i, 
+        )
+
+        extra_trees_model.fit(X, y)
+        feature_selector = SelectFromModel(extra_trees_model)
+        X_selected = feature_selector.fit_transform(X, y)
+
+        results = experiment(X_selected, y)
+        print(results)
+
+def ANOVA(X, y):
+    for i in range(2, 10, 1):
+        k = i  # Number of top features to select
+        selector_anova = SelectKBest(f_classif, k=k)
+        X_selected = selector_anova.fit_transform(X, y)
+        # print the shape of the dataset
+        print(X_selected.shape)
+        # run the experiment 
+        results = experiment(X_selected, y)
+        print(results)
+
+    for i in range(10, 80, 5):
+        k = i  # Number of top features to select
+        selector_anova = SelectKBest(f_classif, k=k)
+        X_selected = selector_anova.fit_transform(X, y)
+        # print the shape of the dataset
+        # print( X_selected.shape)
+        # run the experiment 
+        results = experiment( X_selected, y)
+        print(results)
+
+def MutualInformation(X, y):
+    for i in range(2, 10, 1):
+        k = i  # Number of top features to select
+        selector_mutual_information = SelectKBest(score_func=mutual_info_classif, k=k)
+        X_selected = selector_mutual_information.fit_transform(X, y)
+        # print the shape of the dataset
+        print(X_selected.shape)
+        # run the experiment 
+        results = experiment(X_selected, y)
+        print(results)
+
+    for i in range(10, 80, 5):
+        k = i  # Number of top features to select
+        selector_mutual_information = SelectKBest(score_func=mutual_info_classif, k=k)
+        X_selected = selector_mutual_information.fit_transform(X, y)
+        # print the shape of the dataset
+        # print( X_selected.shape)
+        # run the experiment 
+        results = experiment( X_selected, y)
+        print(results)
+
 if __name__ == '__main__':
 
     # set a random seed
@@ -80,16 +195,27 @@ if __name__ == '__main__':
     # read the dataset
     dataset = pd.read_csv('data/df_original_100000.csv')
 
+    print(len(dataset.columns))
+
     # extract the labels
     y = np.array(dataset['Label'])
     del dataset['Label']
     X = np.array(dataset)
 
-    # print the shape of the dataset
-    print(X.shape)
+    # Chi2(X, y)
+    # MutualInformation(X,y)
+    # Lasso(X, y)
+    # LowVariance(X, y)
+    # ExtraTree(X, y)
+    # ANOVA(X, y)
+    # MutualInformation(X, y)
 
-    # run the experiment 
-    results = experiment(X, y)
+    
 
-    print(results)
+
+
+    
+
+
+    
     
