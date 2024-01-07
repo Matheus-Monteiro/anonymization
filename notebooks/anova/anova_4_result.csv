@@ -1,0 +1,17 @@
+model,anonymized train,anonymized test,accuracy,precision,recall,f1_score
+KNN,True,True,78.440%,71.027%,96.046%,81.660%
+KNN,True,False,85.514%,80.519%,97.770%,87.648%
+KNN,False,True,78.490%,71.049%,96.146%,81.711%
+KNN,False,False,99.882%,99.948%,99.816%,99.882%
+DecisionTree,True,True,59.703%,55.848%,85.331%,67.032%
+DecisionTree,True,False,52.531%,83.334%,38.393%,31.159%
+DecisionTree,False,True,56.557%,53.678%,99.292%,69.647%
+DecisionTree,False,False,99.974%,99.948%,100.000%,99.974%
+RandomForest,True,True,56.263%,52.825%,78.904%,62.614%
+RandomForest,True,False,74.986%,67.147%,98.082%,79.707%
+RandomForest,False,True,56.938%,53.905%,99.476%,69.880%
+RandomForest,False,False,99.974%,99.948%,100.000%,99.974%
+GaussianNB,True,True,77.754%,70.735%,94.674%,80.972%
+GaussianNB,True,False,77.752%,70.735%,94.670%,80.970%
+GaussianNB,False,True,77.846%,70.776%,94.858%,81.066%
+GaussianNB,False,False,77.688%,70.707%,94.542%,80.905%
